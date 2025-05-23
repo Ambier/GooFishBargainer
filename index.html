@@ -1,0 +1,1572 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>咸鱼比价侠(GooFishBargainer)- 智能比价，省钱神器</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', path='style.css') }}">
+    <style>
+        :root {
+            --primary-color: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary-color: #f59e0b;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --info-color: #3b82f6;
+            --light-bg: #f8fafc;
+            --dark-bg: #1e293b;
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --card-shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --border-radius: 12px;
+            --border-radius-lg: 16px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .main-container {
+            min-height: 100vh;
+            padding: 2rem 0;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--card-shadow-lg);
+            transition: var(--transition);
+        }
+
+        .glass-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .left-panel {
+            padding: 2.5rem;
+            position: sticky;
+            top: 2rem;
+            height: fit-content;
+        }
+
+        .right-panel {
+            padding: 2.5rem;
+            max-height: calc(100vh - 4rem);
+            overflow-y: auto;
+        }
+
+        .brand-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .brand-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            box-shadow: var(--card-shadow);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .brand-title {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .brand-subtitle {
+            color: #64748b;
+            font-size: 1rem;
+            font-weight: 400;
+        }
+
+        .form-section {
+            margin-bottom: 2rem;
+        }
+
+        .form-section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-section-icon {
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.8rem;
+        }
+
+        .modern-input {
+            border: 2px solid #e2e8f0;
+            border-radius: var(--border-radius);
+            padding: 0.875rem 1rem;
+            font-size: 0.95rem;
+            transition: var(--transition);
+            background: #ffffff;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .modern-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+            outline: none;
+        }
+
+        .modern-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .primary-button {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            border: none;
+            border-radius: var(--border-radius);
+            padding: 1rem 2rem;
+            font-size: 1rem;
+            font-weight: 600;
+            color: white;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+        }
+
+        .primary-button:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--card-shadow-lg);
+            background: linear-gradient(135deg, var(--primary-dark), #3730a3);
+        }
+
+        .primary-button:active {
+            transform: translateY(0);
+        }
+
+        .primary-button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .button-loading {
+            position: relative;
+        }
+
+        .button-loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            margin: -10px 0 0 -10px;
+            border: 2px solid transparent;
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .security-note {
+            background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+            border: 1px solid #a7f3d0;
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            text-align: center;
+            color: #065f46;
+            font-size: 0.875rem;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .progress-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .modern-progress {
+            background: #e2e8f0;
+            border-radius: 50px;
+            height: 8px;
+            overflow: hidden;
+            min-width: 200px;
+        }
+
+        .modern-progress-bar {
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            height: 100%;
+            border-radius: 50px;
+            transition: width 0.5s ease;
+            position: relative;
+        }
+
+        .modern-progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: #64748b;
+        }
+
+        .empty-state-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2rem;
+            color: #94a3b8;
+        }
+
+        .progress-item {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: var(--card-shadow);
+            border-left: 4px solid var(--primary-color);
+            transition: var(--transition);
+            animation: slideInRight 0.5s ease;
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .progress-item:hover {
+            transform: translateX(5px);
+            box-shadow: var(--card-shadow-lg);
+        }
+
+        .progress-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-item-title {
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 1rem;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-running {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .status-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: var(--card-shadow);
+            transition: var(--transition);
+            border: 1px solid #e2e8f0;
+            animation: fadeInUp 0.5s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .product-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--card-shadow-lg);
+            border-color: var(--primary-color);
+        }
+
+        .product-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .product-title {
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 1.1rem;
+            line-height: 1.4;
+            flex: 1;
+            margin-right: 1rem;
+        }
+
+        .product-price {
+            background: linear-gradient(135deg, var(--danger-color), #dc2626);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: var(--border-radius);
+            font-weight: 700;
+            font-size: 1.1rem;
+            white-space: nowrap;
+        }
+
+        .product-meta {
+            display: flex;
+            gap: 1rem;
+            color: #64748b;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .product-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .product-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-button {
+            padding: 0.5rem 1rem;
+            border-radius: var(--border-radius);
+            font-size: 0.875rem;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .action-button-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .action-button-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .action-button-secondary {
+            background: #f1f5f9;
+            color: #475569;
+            border: 1px solid #e2e8f0;
+        }
+
+        .action-button-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        .best-deal-card {
+            background: linear-gradient(135deg, var(--success-color), #059669);
+            color: white;
+            border: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .best-deal-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .best-deal-badge {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: var(--secondary-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0 var(--border-radius) 0 var(--border-radius);
+            font-weight: 600;
+            font-size: 0.875rem;
+            box-shadow: var(--card-shadow);
+        }
+
+        .connection-status {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.75rem 1rem;
+            border-radius: var(--border-radius);
+            font-size: 0.875rem;
+            font-weight: 500;
+            z-index: 1000;
+            transition: var(--transition);
+            box-shadow: var(--card-shadow);
+        }
+
+        .status-connected {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .status-disconnected {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .status-connecting {
+            background: var(--warning-color);
+            color: white;
+        }
+
+        .pulse-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: currentColor;
+            margin-right: 0.5rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .results-section {
+            margin-top: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1rem;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 1rem 0;
+            }
+
+            .left-panel, .right-panel {
+                padding: 1.5rem;
+            }
+
+            .brand-title {
+                font-size: 1.5rem;
+            }
+
+            .progress-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .modern-progress {
+                width: 100%;
+            }
+
+            .product-header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .product-price {
+                align-self: flex-start;
+            }
+
+            .connection-status {
+                top: 0.5rem;
+                right: 0.5rem;
+                font-size: 0.75rem;
+                padding: 0.5rem 0.75rem;
+            }
+        }
+
+        /* 滚动条样式 */
+        .right-panel::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .right-panel::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 3px;
+        }
+
+        .right-panel::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+
+        .right-panel::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* 加载动画 */
+        .loading-dots {
+            display: inline-flex;
+            gap: 4px;
+        }
+
+        .loading-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+            animation: loadingDots 1.4s infinite ease-in-out;
+        }
+
+        .loading-dot:nth-child(1) { animation-delay: -0.32s; }
+        .loading-dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes loadingDots {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <!-- 连接状态指示器 -->
+    <div class="connection-status status-connecting" id="connectionStatus">
+        <span class="pulse-dot"></span>
+        <span>连接中</span>
+    </div>
+
+    <div class="container-fluid main-container">
+        <div class="row justify-content-center">
+            <!-- 左侧操作面板 -->
+            <div class="col-lg-5 col-md-6 mb-4">
+                <div class="glass-card left-panel">
+                    <!-- 品牌头部 -->
+                    <div class="brand-header">
+                        <div class="brand-icon">
+                            <i class="bi bi-search" style="font-size: 2rem; color: white;"></i>
+                        </div>
+                        <h1 class="brand-title">咸鱼比价侠(GooFishBargainer)</h1>
+                        <p class="brand-subtitle">智能搜索 · 自动谈判 · 找到最优价格</p>
+                    </div>
+
+                    <form id="searchForm">
+                        <!-- 商品需求 -->
+                        <div class="form-section">
+                            <div class="form-section-title">
+                                <div class="form-section-icon">
+                                    <i class="bi bi-chat-text"></i>
+                                </div>
+                                商品需求描述
+                            </div>
+                            <textarea class="form-control modern-input modern-textarea" id="query" 
+                                    placeholder="例如：想要一个二手iPhone 13，128G，成色较新，最好是白色的"
+                                    required></textarea>
+                            <div class="form-text text-muted mt-2">
+                                <i class="bi bi-lightbulb"></i> 
+                                描述越详细，搜索结果越精准
+                            </div>
+                        </div>
+
+                        <!-- 价格预算 -->
+                        <div class="form-section">
+                            <div class="form-section-title">
+                                <div class="form-section-icon">
+                                    <i class="bi bi-currency-yen"></i>
+                                </div>
+                                最高价格预算
+                            </div>
+                            <div class="input-group">
+                                <span class="input-group-text">¥</span>
+                                <input type="number" class="form-control modern-input" id="maxPrice" 
+                                       placeholder="3000" min="1" step="0.01" required>
+                            </div>
+                        </div>
+
+                        <!-- 账号设置 -->
+                        <div class="form-section">
+                            <div class="form-section-title">
+                                <div class="form-section-icon">
+                                    <i class="bi bi-person-circle"></i>
+                                </div>
+                                咸鱼账号设置
+                            </div>
+                            <div class="mb-3">
+                                <label for="username" class="form-label">用户名/手机号</label>
+                                <input type="text" class="form-control modern-input" id="username" 
+                                       placeholder="请输入咸鱼用户名或手机号" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="password" class="form-label">密码</label>
+                                <input type="password" class="form-control modern-input" id="password" 
+                                       placeholder="请输入密码" required>
+                            </div>
+                        </div>
+
+                        <!-- 开始按钮 -->
+                        <button type="submit" class="btn primary-button w-100" id="startBtn">
+                            <i class="bi bi-play-fill me-2"></i>
+                            <span id="buttonText">开始智能比价</span>
+                        </button>
+                    </form>
+
+                    <!-- 安全提示 -->
+                    <div class="security-note mt-4">
+                        <i class="bi bi-shield-check me-2"></i>
+                        您的账号信息将被安全加密处理，我们承诺保护您的隐私安全
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右侧进度展示面板 -->
+            <div class="col-lg-7 col-md-6">
+                <div class="glass-card right-panel">
+                    <!-- 进度头部 -->
+                    <div class="progress-header">
+                        <div class="progress-title">
+                            <div class="section-icon">
+                                <i class="bi bi-activity"></i>
+                            </div>
+                            比价进度
+                        </div>
+                        <div class="progress-controls">
+                            <div class="modern-progress">
+                                <div class="modern-progress-bar" id="overallProgress" style="width: 0%"></div>
+                            </div>
+                            <div class="progress-stats">
+                                <span class="progress-text" id="progressText">0%</span>
+                                <span class="progress-time" id="progressTime">00:00</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 任务状态卡片 -->
+                    <div id="taskStatusCard" class="task-status-card" style="display: none;">
+                        <div class="task-status-header">
+                            <div class="task-status-icon" id="taskStatusIcon">
+                                <i class="bi bi-clock"></i>
+                            </div>
+                            <div class="task-status-info">
+                                <h6 class="task-status-title" id="taskStatusTitle">准备中</h6>
+                                <p class="task-status-desc" id="taskStatusDesc">正在初始化比价任务...</p>
+                            </div>
+                            <div class="task-status-badge" id="taskStatusBadge">
+                                <span class="status-badge status-pending">准备中</span>
+                            </div>
+                        </div>
+                        <div class="task-metrics" id="taskMetrics" style="display: none;">
+                            <div class="metric-item">
+                                <span class="metric-label">已搜索</span>
+                                <span class="metric-value" id="searchedCount">0</span>
+                            </div>
+                            <div class="metric-item">
+                                <span class="metric-label">已谈判</span>
+                                <span class="metric-value" id="negotiatedCount">0</span>
+                            </div>
+                            <div class="metric-item">
+                                <span class="metric-label">最低价</span>
+                                <span class="metric-value" id="lowestPrice">¥0</span>
+                            </div>
+                            <div class="metric-item">
+                                <span class="metric-label">节省</span>
+                                <span class="metric-value" id="savedAmount">¥0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 进度内容 -->
+                    <div id="progressContainer">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">
+                                <i class="bi bi-rocket"></i>
+                            </div>
+                            <h5>准备开始智能比价</h5>
+                            <p>请在左侧填写商品需求和账号信息，然后点击"开始智能比价"按钮</p>
+                            <div class="mt-3">
+                                <small class="text-muted">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    我们将自动搜索商品、与卖家谈判，为您找到最优价格
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 执行摘要区域 -->
+                    <div id="executionSummary" class="execution-summary" style="display: none;">
+                        <div class="section-title">
+                            <div class="section-icon" style="background: linear-gradient(135deg, var(--info-color), #2563eb);">
+                                <i class="bi bi-graph-up"></i>
+                            </div>
+                            执行摘要
+                        </div>
+                        <div class="summary-grid">
+                            <div class="summary-card">
+                                <div class="summary-icon">
+                                    <i class="bi bi-search"></i>
+                                </div>
+                                <div class="summary-content">
+                                    <h6>搜索阶段</h6>
+                                    <p id="searchSummary">-</p>
+                                </div>
+                            </div>
+                            <div class="summary-card">
+                                <div class="summary-icon">
+                                    <i class="bi bi-chat-dots"></i>
+                                </div>
+                                <div class="summary-content">
+                                    <h6>谈判阶段</h6>
+                                    <p id="negotiationSummary">-</p>
+                                </div>
+                            </div>
+                            <div class="summary-card">
+                                <div class="summary-icon">
+                                    <i class="bi bi-trophy"></i>
+                                </div>
+                                <div class="summary-content">
+                                    <h6>最终结果</h6>
+                                    <p id="resultSummary">-</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 商品结果展示区域 -->
+                    <div id="resultsContainer" class="results-section" style="display: none;">
+                        <div class="results-header">
+                            <div class="section-title">
+                                <div class="section-icon">
+                                    <i class="bi bi-list-ul"></i>
+                                </div>
+                                找到的商品
+                                <span class="results-count" id="resultsCount">(0)</span>
+                            </div>
+                            <div class="results-controls">
+                                <select class="form-select form-select-sm" id="sortSelect">
+                                    <option value="price">按价格排序</option>
+                                    <option value="negotiated">按谈判结果排序</option>
+                                    <option value="savings">按节省金额排序</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="productsList"></div>
+
+                        <div id="bestDealContainer" style="display: none;">
+                            <div class="section-title mt-4">
+                                <div class="section-icon" style="background: linear-gradient(135deg, var(--success-color), #059669);">
+                                    <i class="bi bi-trophy"></i>
+                                </div>
+                                最佳推荐
+                                <div class="best-deal-stats">
+                                    <span class="savings-badge" id="savingsBadge">节省 ¥0</span>
+                                </div>
+                            </div>
+                            <div id="bestDeal"></div>
+                        </div>
+                    </div>
+
+                    <!-- 执行历史记录 -->
+                    <div id="executionHistory" class="execution-history" style="display: none;">
+                        <div class="section-title">
+                            <div class="section-icon" style="background: linear-gradient(135deg, var(--secondary-color), #d97706);">
+                                <i class="bi bi-clock-history"></i>
+                            </div>
+                            执行历史
+                            <button class="btn btn-sm btn-outline-secondary ms-auto" id="clearHistoryBtn">
+                                <i class="bi bi-trash3"></i> 清空历史
+                            </button>
+                        </div>
+                        <div id="historyList" class="history-list"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        class XianyuComparison {
+            constructor() {
+                this.ws = null;
+                this.clientId = this.generateClientId();
+                this.isConnected = false;
+                this.currentTaskId = null;
+                this.taskStartTime = null;
+                this.progressTimer = null;
+                this.executionHistory = JSON.parse(localStorage.getItem('executionHistory') || '[]');
+                this.currentTaskData = null;
+                this.init();
+            }
+
+            generateClientId() {
+                return 'client_' + Math.random().toString(36).substr(2, 9);
+            }
+
+            init() {
+                this.connectWebSocket();
+                this.bindEvents();
+                this.updateConnectionStatus('connecting');
+                this.loadExecutionHistory();
+            }
+
+            connectWebSocket() {
+                const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+                const wsUrl = `${protocol}//${window.location.host}/ws/${this.clientId}`;
+                
+                this.ws = new WebSocket(wsUrl);
+                
+                this.ws.onopen = () => {
+                    this.isConnected = true;
+                    this.updateConnectionStatus('connected');
+                    console.log('WebSocket连接已建立');
+                };
+
+                this.ws.onmessage = (event) => {
+                    try {
+                        const data = JSON.parse(event.data);
+                        this.handleMessage(data);
+                    } catch (error) {
+                        console.error('解析WebSocket消息失败:', error);
+                    }
+                };
+
+                this.ws.onclose = () => {
+                    this.isConnected = false;
+                    this.updateConnectionStatus('disconnected');
+                    console.log('WebSocket连接已关闭');
+                    
+                    // 尝试重连
+                    setTimeout(() => {
+                        if (!this.isConnected) {
+                            this.connectWebSocket();
+                        }
+                    }, 3000);
+                };
+
+                this.ws.onerror = (error) => {
+                    console.error('WebSocket错误:', error);
+                    this.updateConnectionStatus('disconnected');
+                };
+            }
+
+            updateConnectionStatus(status) {
+                const statusElement = document.getElementById('connectionStatus');
+                const statusMap = {
+                    'connecting': { class: 'status-connecting', text: '连接中', icon: 'pulse-dot' },
+                    'connected': { class: 'status-connected', text: '已连接', icon: 'bi-wifi' },
+                    'disconnected': { class: 'status-disconnected', text: '连接断开', icon: 'bi-wifi-off' }
+                };
+
+                const config = statusMap[status];
+                statusElement.className = `connection-status ${config.class}`;
+                
+                if (config.icon === 'pulse-dot') {
+                    statusElement.innerHTML = `<span class="pulse-dot"></span><span>${config.text}</span>`;
+                } else {
+                    statusElement.innerHTML = `<i class="${config.icon} me-2"></i><span>${config.text}</span>`;
+                }
+            }
+
+            bindEvents() {
+                const form = document.getElementById('searchForm');
+                form.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.startComparison();
+                });
+
+                // 排序控制
+                const sortSelect = document.getElementById('sortSelect');
+                sortSelect.addEventListener('change', () => {
+                    this.sortProducts(sortSelect.value);
+                });
+
+                // 清空历史按钮
+                const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+                clearHistoryBtn.addEventListener('click', () => {
+                    this.clearExecutionHistory();
+                });
+            }
+
+            async startComparison() {
+                if (!this.isConnected) {
+                    this.showError('WebSocket连接未建立，请稍后重试');
+                    return;
+                }
+
+                const query = document.getElementById('query').value.trim();
+                const maxPrice = parseFloat(document.getElementById('maxPrice').value);
+                const username = document.getElementById('username').value.trim();
+                const password = document.getElementById('password').value.trim();
+
+                if (!query || !maxPrice || !username || !password) {
+                    this.showError('请填写完整信息');
+                    return;
+                }
+
+                // 保存当前任务数据
+                this.currentTaskData = {
+                    query: query,
+                    maxPrice: maxPrice,
+                    username: username,
+                    startTime: new Date()
+                };
+
+                this.setButtonLoading(true);
+                this.clearResults();
+                this.initializeTask();
+
+                try {
+                    const response = await fetch('/api/start_comparison', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            query: query,
+                            max_price: maxPrice,
+                            credentials: {
+                                username: username,
+                                password: password
+                            }
+                        })
+                    });
+
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        this.currentTaskId = result.task_id;
+                        this.showSuccess('比价任务已启动，正在处理中...');
+                        this.startProgressTimer();
+                    } else {
+                        this.showError(result.message || '启动比价任务失败');
+                        this.setButtonLoading(false);
+                    }
+                } catch (error) {
+                    console.error('启动比价失败:', error);
+                    this.showError('网络错误，请检查连接后重试');
+                    this.setButtonLoading(false);
+                }
+            }
+
+            initializeTask() {
+                this.taskStartTime = Date.now();
+                this.showTaskStatus('initializing', '初始化中', '正在准备比价任务...', 'status-pending');
+                document.getElementById('taskStatusCard').style.display = 'block';
+            }
+
+            startProgressTimer() {
+                this.progressTimer = setInterval(() => {
+                    if (this.taskStartTime) {
+                        const elapsed = Math.floor((Date.now() - this.taskStartTime) / 1000);
+                        const minutes = Math.floor(elapsed / 60);
+                        const seconds = elapsed % 60;
+                        document.getElementById('progressTime').textContent = 
+                            `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                    }
+                }, 1000);
+            }
+
+            stopProgressTimer() {
+                if (this.progressTimer) {
+                    clearInterval(this.progressTimer);
+                    this.progressTimer = null;
+                }
+            }
+
+            showTaskStatus(status, title, description, badgeClass) {
+                const iconMap = {
+                    'initializing': 'bi-clock',
+                    'searching': 'bi-search',
+                    'negotiating': 'bi-chat-dots',
+                    'comparing': 'bi-graph-up',
+                    'completed': 'bi-check-circle',
+                    'failed': 'bi-x-circle'
+                };
+
+                document.getElementById('taskStatusIcon').innerHTML = `<i class="${iconMap[status] || 'bi-clock'}"></i>`;
+                document.getElementById('taskStatusTitle').textContent = title;
+                document.getElementById('taskStatusDesc').textContent = description;
+                document.getElementById('taskStatusBadge').innerHTML = `<span class="status-badge ${badgeClass}">${title}</span>`;
+            }
+
+            updateTaskMetrics(metrics) {
+                document.getElementById('taskMetrics').style.display = 'flex';
+                document.getElementById('searchedCount').textContent = metrics.searchedCount || 0;
+                document.getElementById('negotiatedCount').textContent = metrics.negotiatedCount || 0;
+                document.getElementById('lowestPrice').textContent = `¥${metrics.lowestPrice || 0}`;
+                document.getElementById('savedAmount').textContent = `¥${metrics.savedAmount || 0}`;
+            }
+
+            handleMessage(data) {
+                switch (data.type) {
+                    case 'progress':
+                        this.updateProgress(data.data);
+                        break;
+                    case 'task_status':
+                        this.updateTaskStatus(data.data);
+                        break;
+                    case 'products':
+                        this.displayProducts(data.data);
+                        break;
+                    case 'best_deal':
+                        this.displayBestDeal(data.data);
+                        break;
+                    case 'task_completed':
+                        this.handleTaskCompleted(data.data);
+                        break;
+                    case 'error':
+                        this.showError(data.message);
+                        this.setButtonLoading(false);
+                        this.stopProgressTimer();
+                        break;
+                    case 'complete':
+                        this.handleTaskComplete();
+                        break;
+                    default:
+                        console.log('未知消息类型:', data);
+                }
+            }
+
+            updateTaskStatus(statusData) {
+                const statusMap = {
+                    'searching': { title: '搜索中', desc: '正在搜索符合条件的商品...', class: 'status-running' },
+                    'negotiating': { title: '谈判中', desc: '正在与卖家进行价格谈判...', class: 'status-running' },
+                    'comparing': { title: '分析中', desc: '正在分析比价结果...', class: 'status-running' },
+                    'completed': { title: '已完成', desc: '比价任务已成功完成', class: 'status-success' },
+                    'failed': { title: '失败', desc: '任务执行失败', class: 'status-error' }
+                };
+
+                const config = statusMap[statusData.status];
+                if (config) {
+                    this.showTaskStatus(statusData.status, config.title, config.desc, config.class);
+                }
+
+                if (statusData.metrics) {
+                    this.updateTaskMetrics(statusData.metrics);
+                }
+            }
+
+            updateProgress(progressData) {
+                const container = document.getElementById('progressContainer');
+                const progressBar = document.getElementById('overallProgress');
+                const progressText = document.getElementById('progressText');
+                
+                // 更新总进度
+                const percentage = Math.round(progressData.percentage || 0);
+                progressBar.style.width = `${percentage}%`;
+                progressText.textContent = `${percentage}%`;
+                
+                // 清空容器并添加进度项
+                container.innerHTML = '';
+                
+                if (progressData.steps && progressData.steps.length > 0) {
+                    progressData.steps.forEach((step, index) => {
+                        const progressItem = this.createProgressItem(step, index);
+                        container.appendChild(progressItem);
+                    });
+                }
+            }
+
+            createProgressItem(step, index) {
+                const item = document.createElement('div');
+                item.className = 'progress-item';
+                item.style.animationDelay = `${index * 0.1}s`;
+                
+                const statusClass = this.getStatusClass(step.status);
+                const statusText = this.getStatusText(step.status);
+                const icon = this.getStatusIcon(step.status);
+                
+                // 添加时间戳
+                const timestamp = step.timestamp ? new Date(step.timestamp).toLocaleTimeString() : '';
+                
+                item.innerHTML = `
+                    <div class="progress-item-header">
+                        <div class="progress-item-title">
+                            <i class="${icon} me-2"></i>
+                            ${step.title}
+                            ${timestamp ? `<small class="text-muted ms-2">${timestamp}</small>` : ''}
+                        </div>
+                        <span class="status-badge ${statusClass}">${statusText}</span>
+                    </div>
+                    ${step.description ? `<div class="text-muted">${step.description}</div>` : ''}
+                    ${step.details ? `<div class="mt-2"><small class="text-muted">${step.details}</small></div>` : ''}
+                    ${step.duration ? `<div class="mt-1"><small class="text-info">耗时: ${step.duration}</small></div>` : ''}
+                `;
+                
+                return item;
+            }
+
+            getStatusClass(status) {
+                const statusMap = {
+                    'pending': 'status-pending',
+                    'running': 'status-running',
+                    'completed': 'status-success',
+                    'failed': 'status-error'
+                };
+                return statusMap[status] || 'status-pending';
+            }
+
+            getStatusText(status) {
+                const statusMap = {
+                    'pending': '等待中',
+                    'running': '进行中',
+                    'completed': '已完成',
+                    'failed': '失败'
+                };
+                return statusMap[status] || '未知';
+            }
+
+            getStatusIcon(status) {
+                const iconMap = {
+                    'pending': 'bi-clock',
+                    'running': 'bi-arrow-repeat',
+                    'completed': 'bi-check-circle',
+                    'failed': 'bi-x-circle'
+                };
+                return iconMap[status] || 'bi-circle';
+            }
+
+            handleTaskCompleted(taskData) {
+                this.stopProgressTimer();
+                this.setButtonLoading(false);
+                
+                // 显示执行摘要
+                this.showExecutionSummary(taskData);
+                
+                // 保存到历史记录
+                this.saveToHistory(taskData);
+                
+                // 显示结果
+                if (taskData.products && taskData.products.length > 0) {
+                    this.displayProducts(taskData.products);
+                }
+                
+                if (taskData.best_deal) {
+                    this.displayBestDeal(taskData.best_deal);
+                }
+                
+                this.showSuccess('比价任务完成！');
+            }
+
+            showExecutionSummary(taskData) {
+                const summaryContainer = document.getElementById('executionSummary');
+                summaryContainer.style.display = 'block';
+                
+                const searchCount = taskData.products ? taskData.products.length : 0;
+                const negotiationCount = taskData.negotiations ? taskData.negotiations.filter(n => n.success).length : 0;
+                const bestPrice = taskData.best_deal ? taskData.best_deal.price : 0;
+                const originalPrice = this.currentTaskData ? this.currentTaskData.maxPrice : 0;
+                const savings = originalPrice - bestPrice;
+                
+                document.getElementById('searchSummary').textContent = `找到 ${searchCount} 个商品`;
+                document.getElementById('negotiationSummary').textContent = `成功谈判 ${negotiationCount} 个`;
+                document.getElementById('resultSummary').textContent = `最低价 ¥${bestPrice}，节省 ¥${savings.toFixed(2)}`;
+            }
+
+            saveToHistory(taskData) {
+                const historyItem = {
+                    id: Date.now(),
+                    query: this.currentTaskData.query,
+                    maxPrice: this.currentTaskData.maxPrice,
+                    startTime: this.currentTaskData.startTime,
+                    endTime: new Date(),
+                    productsFound: taskData.products ? taskData.products.length : 0,
+                    bestPrice: taskData.best_deal ? taskData.best_deal.price : 0,
+                    savings: this.currentTaskData.maxPrice - (taskData.best_deal ? taskData.best_deal.price : 0),
+                    success: !!taskData.best_deal
+                };
+                
+                this.executionHistory.unshift(historyItem);
+                
+                // 限制历史记录数量
+                if (this.executionHistory.length > 10) {
+                    this.executionHistory = this.executionHistory.slice(0, 10);
+                }
+                
+                localStorage.setItem('executionHistory', JSON.stringify(this.executionHistory));
+                this.loadExecutionHistory();
+            }
+
+            loadExecutionHistory() {
+                const historyContainer = document.getElementById('executionHistory');
+                const historyList = document.getElementById('historyList');
+                
+                if (this.executionHistory.length === 0) {
+                    historyContainer.style.display = 'none';
+                    return;
+                }
+                
+                historyContainer.style.display = 'block';
+                historyList.innerHTML = '';
+                
+                this.executionHistory.forEach(item => {
+                    const historyItem = this.createHistoryItem(item);
+                    historyList.appendChild(historyItem);
+                });
+            }
+
+            createHistoryItem(item) {
+                const div = document.createElement('div');
+                div.className = 'history-item';
+                
+                const duration = Math.round((new Date(item.endTime) - new Date(item.startTime)) / 1000);
+                const statusClass = item.success ? 'text-success' : 'text-danger';
+                const statusIcon = item.success ? 'bi-check-circle' : 'bi-x-circle';
+                
+                div.innerHTML = `
+                    <div class="history-item-header">
+                        <div class="history-item-title">
+                            <i class="${statusIcon} ${statusClass} me-2"></i>
+                            ${item.query}
+                        </div>
+                        <div class="history-item-time">
+                            ${new Date(item.startTime).toLocaleString()}
+                        </div>
+                    </div>
+                    <div class="history-item-details">
+                        <span class="detail-item">找到 ${item.productsFound} 个商品</span>
+                        <span class="detail-item">最低价 ¥${item.bestPrice}</span>
+                        <span class="detail-item">节省 ¥${item.savings.toFixed(2)}</span>
+                        <span class="detail-item">耗时 ${duration}s</span>
+                    </div>
+                `;
+                
+                return div;
+            }
+
+            clearExecutionHistory() {
+                this.executionHistory = [];
+                localStorage.removeItem('executionHistory');
+                document.getElementById('executionHistory').style.display = 'none';
+                this.showInfo('执行历史已清空');
+            }
+
+            displayProducts(products) {
+                const resultsContainer = document.getElementById('resultsContainer');
+                const productsList = document.getElementById('productsList');
+                const resultsCount = document.getElementById('resultsCount');
+                
+                resultsContainer.style.display = 'block';
+                resultsCount.textContent = `(${products.length})`;
+                productsList.innerHTML = '';
+                
+                products.forEach((product, index) => {
+                    const productCard = this.createProductCard(product, index);
+                    productsList.appendChild(productCard);
+                });
+            }
+
+            createProductCard(product, index) {
+                const card = document.createElement('div');
+                card.className = 'product-card';
+                card.style.animationDelay = `${index * 0.1}s`;
+                
+                // 计算节省金额
+                const originalPrice = this.currentTaskData ? this.currentTaskData.maxPrice : product.price;
+                const savings = originalPrice - product.price;
+                const savingsPercent = ((savings / originalPrice) * 100).toFixed(1);
+                
+                card.innerHTML = `
+                    <div class="product-header">
+                        <div class="product-title">${product.title}</div>
+                        <div class="product-price-container">
+                            <div class="product-price">¥${product.price}</div>
+                            ${savings > 0 ? `<div class="savings-info">节省 ¥${savings.toFixed(2)} (${savingsPercent}%)</div>` : ''}
+                        </div>
+                    </div>
+                    <div class="product-meta">
+                        <div class="product-meta-item">
+                            <i class="bi bi-person"></i>
+                            <span>${product.seller_name}</span>
+                        </div>
+                        <div class="product-meta-item">
+                            <i class="bi bi-geo-alt"></i>
+                            <span>${product.location}</span>
+                        </div>
+                        ${product.negotiated_price ? `
+                        <div class="product-meta-item">
+                            <i class="bi bi-chat-dots text-success"></i>
+                            <span>谈判价 ¥${product.negotiated_price}</span>
+                        </div>
+                        ` : ''}
+                    </div>
+                    <div class="product-actions">
+                        <button class="action-button action-button-primary" onclick="window.open('${product.url}', '_blank')">
+                            <i class="bi bi-eye me-1"></i>查看详情
+                        </button>
+                        <button class="action-button action-button-secondary" onclick="app.negotiateWithSeller('${product.seller_id}')">
+                            <i class="bi bi-chat-dots me-1"></i>开始谈判
+                        </button>
+                    </div>
+                `;
+                
+                return card;
+            }
+
+            displayBestDeal(bestDeal) {
+                const container = document.getElementById('bestDealContainer');
+                const dealElement = document.getElementById('bestDeal');
+                const savingsBadge = document.getElementById('savingsBadge');
+                
+                container.style.display = 'block';
+                
+                // 计算节省金额
+                const originalPrice = this.currentTaskData ? this.currentTaskData.maxPrice : bestDeal.price;
+                const savings = originalPrice - bestDeal.price;
+                savingsBadge.textContent = `节省 ¥${savings.toFixed(2)}`;
+                
+                const card = document.createElement('div');
+                card.className = 'product-card best-deal-card';
+                card.innerHTML = `
+                    <div class="best-deal-badge">
+                        <i class="bi bi-star-fill me-1"></i>最佳选择
+                    </div>
+                    <div class="product-header">
+                        <div class="product-title">${bestDeal.title}</div>
+                        <div class="product-price-container">
+                            <div class="product-price">¥${bestDeal.price}</div>
+                            <div class="savings-info">节省 ¥${savings.toFixed(2)}</div>
+                        </div>
+                    </div>
+                    <div class="product-meta">
+                        <div class="product-meta-item">
+                            <i class="bi bi-person"></i>
+                            <span>${bestDeal.seller_name}</span>
+                        </div>
+                        <div class="product-meta-item">
+                            <i class="bi bi-geo-alt"></i>
+                            <span>${bestDeal.location}</span>
+                        </div>
+                        <div class="product-meta-item">
+                            <i class="bi bi-percent"></i>
+                            <span>节省 ${((savings / originalPrice) * 100).toFixed(1)}%</span>
+                        </div>
+                    </div>
+                    <div class="product-actions">
+                        <button class="action-button action-button-primary" onclick="window.open('${bestDeal.url}', '_blank')" style="background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3);">
+                            <i class="bi bi-eye me-1"></i>查看详情
+                        </button>
+                        <button class="action-button action-button-secondary" onclick="app.negotiateWithSeller('${bestDeal.seller_id}')" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white;">
+                            <i class="bi bi-chat-dots me-1"></i>联系卖家
+                        </button>
+                    </div>
+                `;
+                
+                dealElement.innerHTML = '';
+                dealElement.appendChild(card);
+            }
+
+            sortProducts(sortBy) {
+                const productsList = document.getElementById('productsList');
+                const products = Array.from(productsList.children);
+                
+                products.sort((a, b) => {
+                    // 这里需要根据实际的产品数据进行排序
+                    // 简化实现，实际应该从产品数据中获取排序字段
+                    return 0;
+                });
+                
+                // 重新排列DOM元素
+                products.forEach(product => productsList.appendChild(product));
+            }
+
+            negotiateWithSeller(sellerId) {
+                this.showInfo(`正在与卖家 ${sellerId} 建立联系...`);
+                // 这里可以添加具体的谈判逻辑
+            }
+
+            setButtonLoading(loading) {
+                const button = document.getElementById('startBtn');
+                const buttonText = document.getElementById('buttonText');
+                
+                if (loading) {
+                    button.disabled = true;
+                    button.classList.add('button-loading');
+                    buttonText.innerHTML = '<span class="loading-dots"><span class="loading-dot"></span><span class="loading-dot"></span><span class="loading-dot"></span></span> 处理中';
+                } else {
+                    button.disabled = false;
+                    button.classList.remove('button-loading');
+                    buttonText.innerHTML = '开始智能比价';
+                }
+            }
+
+            clearResults() {
+                document.getElementById('resultsContainer').style.display = 'none';
+                document.getElementById('executionSummary').style.display = 'none';
+                document.getElementById('taskStatusCard').style.display = 'none';
+                document.getElementById('progressContainer').innerHTML = '';
+                document.getElementById('overallProgress').style.width = '0%';
+                document.getElementById('progressText').textContent = '0%';
+                document.getElementById('progressTime').textContent = '00:00';
+            }
+
+            showError(message) {
+                this.showToast(message, 'error');
+            }
+
+            showSuccess(message) {
+                this.showToast(message, 'success');
+            }
+
+            showInfo(message) {
+                this.showToast(message, 'info');
+            }
+
+            showToast(message, type) {
+                // 创建toast通知
+                const toast = document.createElement('div');
+                toast.className = `toast align-items-center text-white bg-${type === 'error' ? 'danger' : type === 'success' ? 'success' : 'info'} border-0`;
+                toast.setAttribute('role', 'alert');
+                toast.style.position = 'fixed';
+                toast.style.top = '20px';
+                toast.style.left = '50%';
+                toast.style.transform = 'translateX(-50%)';
+                toast.style.zIndex = '9999';
+                
+                toast.innerHTML = `
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            <i class="bi bi-${type === 'error' ? 'exclamation-triangle' : type === 'success' ? 'check-circle' : 'info-circle'} me-2"></i>
+                            ${message}
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                    </div>
+                `;
+                
+                document.body.appendChild(toast);
+                
+                const bsToast = new bootstrap.Toast(toast);
+                bsToast.show();
+                
+                // 自动移除
+                setTimeout(() => {
+                    if (toast.parentNode) {
+                        toast.parentNode.removeChild(toast);
+                    }
+                }, 5000);
+            }
+        }
+
+        // 初始化应用
+        const app = new XianyuComparison();
+    </script>
+</body>
+</html> 
