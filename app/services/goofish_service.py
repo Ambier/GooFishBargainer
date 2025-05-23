@@ -11,7 +11,7 @@ from selenium.webdriver.chrome.options import Options
 from bs4 import BeautifulSoup
 from typing import List, Dict, Any, Optional
 from loguru import logger
-from app.models.schemas import ProductInfo, UserCredentials
+from app.models.schema import ProductInfo, UserCredentials
 import time
 import random
 from selenium.webdriver.common.keys import Keys

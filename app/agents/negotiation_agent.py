@@ -7,7 +7,7 @@ from loguru import logger
 from app.agents.base_agent import BaseAgent
 from app.services.goofish_service import GoofishService
 from app.services.deepseek_client import deepseek_client
-from app.models.schemas import ProductInfo, CommunicationRecord
+from app.models.schema import ProductInfo, CommunicationRecord
 
 class NegotiationAgent(BaseAgent):
     """谈判Agent - 负责与单个卖家进行价格谈判"""

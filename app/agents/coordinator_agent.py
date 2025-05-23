@@ -10,7 +10,7 @@ from loguru import logger
 from app.agents.base_agent import BaseAgent
 from app.agents.search_agent import SearchAgent
 from app.agents.negotiation_agent import NegotiationAgent
-from app.models.schemas import TaskProgress, TaskStatus, ProductInfo
+from app.models.schema import TaskProgress, TaskStatus, ProductInfo
 from config.settings import settings
 
 class CoordinatorAgent(BaseAgent):

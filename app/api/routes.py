@@ -11,7 +11,7 @@ import json
 import time
 from datetime import datetime
 
-from app.models.schemas import SearchRequest
+from app.models.schema import SearchRequest
 from app.agents.coordinator_agent import CoordinatorAgent
 
 router = APIRouter()

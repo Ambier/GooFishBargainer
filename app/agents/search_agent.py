@@ -7,7 +7,7 @@ from loguru import logger
 from app.agents.base_agent import BaseAgent
 from app.services.goofish_service import GoofishService
 from app.services.deepseek_client import deepseek_client
-from app.models.schemas import ProductInfo, UserCredentials
+from app.models.schema import ProductInfo, UserCredentials
 
 class SearchAgent(BaseAgent):
     """搜索Agent - 负责商品搜索和筛选"""
