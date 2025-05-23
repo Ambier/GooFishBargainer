@@ -1,5 +1,6 @@
 # 咸鱼比价侠 (GooFishBargainer)
 <img width="1787" alt="截屏2025-05-23 14 07 05" src="https://github.com/user-attachments/assets/df51b566-d802-43bd-b446-2d74e8529b85" />
+95%+的代码完全基于Claude 4，辅助人工微调
 
 > 🐟 智能搜索 · 自动谈判 · 找到最优价格
 
