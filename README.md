@@ -1,4 +1,5 @@
 # 咸鱼比价侠 (GooFishBargainer)
+<img width="1787" alt="截屏2025-05-23 14 07 05" src="https://github.com/user-attachments/assets/df51b566-d802-43bd-b446-2d74e8529b85" />
 
 > 🐟 智能搜索 · 自动谈判 · 找到最优价格
 
@@ -290,9 +291,7 @@ git commit -m "docs: 更新API文档"
 
 ## 📞 联系我们
 
-- 项目主页: https://github.com/your-username/xXiaoyu
-- 问题反馈: https://github.com/your-username/xXiaoyu/issues
-- 邮箱: your-email@example.com
+- 项目主页:
 
 ## 📈 更新日志
 
