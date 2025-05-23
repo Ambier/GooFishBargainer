@@ -21,8 +21,8 @@ class Settings:
     LOG_LEVEL: str = os.getenv("LOG_LEVEL", "INFO")
     
     # 咸鱼相关配置
-    XIANYU_BASE_URL: str = "https://2.taobao.com"
-    XIANYU_LOGIN_URL: str = "https://login.taobao.com"
+    XIANYU_BASE_URL: str = "https://www.goofish.com/"
+    XIANYU_LOGIN_URL: str = "https://www.goofish.com/"
     
     # Agent配置
     MAX_CONCURRENT_AGENTS: int = 5
